@@ -1,0 +1,15 @@
+{
+    "variables": {
+        "var1": {
+            "std_dev": 10,
+            "mean": 20,
+            "interpretation_cutoffs": {
+                "0": "Very low",
+                "10": "Low",
+                "20": "Avg",
+                "30": "Above avg",
+                "40": "High"
+            }
+        }
+    }
+}
