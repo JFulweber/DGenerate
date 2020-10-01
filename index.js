@@ -42,17 +42,22 @@ function get_interpretation(value, info){
 
 }
 
+console.log(inputJson);
+
 let OUTPUT = {};
 for (var test in inputJson.tests){
     OUTPUT[test] = {};
     let testInfo = inputJson.tests[test];
+    console.log(testInfo);
     let current = OUTPUT[test];
     for (var k in cfgJson.variables){
         let defVar = cfgJson.variables[k];
-        let observedVar = inputJson.variables[k]; 
+        let observedVar = testInfo.variables[k]; 
+        console.log(defVar);
+        console.log(observedVar);
         let interpretation = get_interpretation(observedVar, defVar);
         current[k] = {};
         current[k].value = testInfo;
-        current[k].std_dev = 
+        // current[k].std_dev = 
     }
 }
