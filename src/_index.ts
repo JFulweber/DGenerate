@@ -1,3 +1,5 @@
+import { exit } from "process";
+import DocmaGen from "./types/DocmaGen";
 const fs = require('fs');
 const path = require('path');
 const {argv} = require('yargs')
@@ -5,13 +7,16 @@ const {argv} = require('yargs')
 console.log(argv);
 
 if(!argv){
-    return console.error("MISSING ARGS");
+    console.error("MISSING ARGS");
+    exit(-1);
 }
 if(!argv.cfg){
-    return console.error("MISSING CFG FILE");
+    console.error("MISSING CFG FILE");
+    exit(-1);
 }
 if(!argv.input){
-    return console.error("MISSING INPUT FILE");
+    console.error("MISSING INPUT FILE");
+    exit(-1);
 }
 
 let {cfg,input} = argv;
@@ -39,7 +44,31 @@ let inputJson = JSON.parse(fs.readFileSync(path.resolve(__dirname,input)));
  * @param {VariableInfo} info 
  */
 function get_interpretation(value, info){
-
+    console.log(value);
+    console.log(info);
+    // linear search through keys to figure out where we lie between
+    let last = Number.MIN_SAFE_INTEGER;
+    const ic = info.interpretation_cutoffs;
+    let upperbound = null;
+    // need to go backwards
+    for(var interp of ic){
+        let current = Number(interp.value);
+        console.log(k,value,last);
+        if(value>last && value<current){
+            upperbound = last;
+            break;
+        }
+        last = current;
+    }
+    if (!upperbound){
+        if(value>last) upperbound = last;
+        if(value<info.interpretation_cutoffs[0].value) upperbound=info.interpretation_cutoffs[0].value;
+    }
+    if(upperbound < ic[0].value || upperbound > ic[ic.length-1].value){
+        return {
+            
+        }
+    }
 }
 
 console.log(inputJson);
@@ -48,16 +77,17 @@ let OUTPUT = {};
 for (var test in inputJson.tests){
     OUTPUT[test] = {};
     let testInfo = inputJson.tests[test];
-    console.log(testInfo);
     let current = OUTPUT[test];
     for (var k in cfgJson.variables){
         let defVar = cfgJson.variables[k];
         let observedVar = testInfo.variables[k]; 
-        console.log(defVar);
-        console.log(observedVar);
         let interpretation = get_interpretation(observedVar, defVar);
         current[k] = {};
         current[k].value = testInfo;
         // current[k].std_dev = 
     }
+}
+
+DocmaGen.interpret = function(obs, variable){
+    return 
 }

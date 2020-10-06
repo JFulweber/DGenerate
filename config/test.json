@@ -3,13 +3,28 @@
         "var1": {
             "std_dev": 10,
             "mean": 20,
-            "interpretation_cutoffs": {
-                "0": "Very low",
-                "10": "Low",
-                "20": "Avg",
-                "30": "Above avg",
-                "40": "High"
-            }
+            "interpretation_cutoffs": [
+                {
+                    "value": 0,
+                    "description": "Very low"
+                },
+                {
+                    "value":10,
+                    "description": "Low"
+                },
+                {
+                    "value":20,
+                    "description": "Avg"
+                },
+                {
+                    "value":30,
+                    "description": "Above avg"
+                },
+                {
+                    "value":40,
+                    "description": "High"
+                }
+            ]
         }
     }
 }
