@@ -1,28 +1,50 @@
 {
     "variables": {
-        "var1": {
-            "std_dev": 10,
-            "mean": 20,
-            "interpretation_cutoffs": [
+        "demographics": {
+            "gender": {
+                "type": "STRING_CONST",
+                "dependents": [
+                    "demographics.pronouns"
+                ]
+            },
+            "pronouns": {
+                "type": "STRING_COND",
+                "values": [
+                    {
+                        "key": "MALE",
+                        "value": {
+                            "personal": "he",
+                            "personalUpper": "He",
+                            "possessive": "his",
+                            "possessiveUpper": "His"
+                        }
+                    },
+                    {
+                        "key": "FEMALE",
+                        "value": {
+                            "personal": "she",
+                            "personalUpper": "She",
+                            "possessive": "hers",
+                            "possessiveUpper": "Hers"
+                        }
+                    }
+                ]
+            }
+        },
+        "fluid_reasoning":{
+            "type":"NUMERIC_COND",
+            "values":[
                 {
-                    "value": 0,
-                    "description": "Very low"
+                    "key": 0,
+                    "value": "very low"
                 },
                 {
-                    "value":10,
-                    "description": "Low"
+                    "key": 10,
+                    "value": "low"
                 },
                 {
-                    "value":20,
-                    "description": "Avg"
-                },
-                {
-                    "value":30,
-                    "description": "Above avg"
-                },
-                {
-                    "value":40,
-                    "description": "High"
+                    "key": 20,
+                    "value": "average"
                 }
             ]
         }

@@ -1,6 +1,16 @@
-/// <reference path="types/DocmaGen.d.ts"/>
-import * from "types/DocmaGen";
+import {DGenerateState} from './DGenerateState';
+import {VariableType} from './EVariableType';
+import {GeneratorSettings} from './GeneratorSettings';
+import {IConditionalVariable} from './IConditionalVariable';
+import {IConstVariable} from './IConstVariable';
+import {TemplatedVariable} from './TemplatedVariable';
+import {IVariable} from './IVariable';
+import {Observation} from './Observation';
+import {VariableConditional} from './VariableConditional';
+import {VariableInterpretation} from './VariableInterpretation';
 
-
-
-export default DocmaGen;
+export default {
+    DGenerateState,
+    VariableType,
+    GeneratorSettings,
+}
