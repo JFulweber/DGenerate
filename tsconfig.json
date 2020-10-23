@@ -2,8 +2,9 @@
     "compilerOptions":{
         "outDir": "./build",
         "allowJs": true,
-        "declaration": true
+        "declaration": true,
+        "downlevelIteration": true
     },
     "compileOnSave": true,
-    "include":["./src/**/*", "@types"]
+    "include":["./src/**/*", "@types"],
 }

@@ -1,15 +1,11 @@
 {
-    "human_info": {
+    "demographics": {
+        "gender":"FEMALE",
         "tester": {
             "first": "Rebecca"
         },
-        "date": "09/30/2020"
+        "date": "09/30/2020",
+        "age":20
     },
-    "tests": {
-        "test": {
-            "variables": {
-                "var1": -10
-            }
-        }
-    }
+    "fluid_reasoning": 10
 }

@@ -29,6 +29,20 @@
                         }
                     }
                 ]
+            },
+            "age": {
+                "type" : "NUMERIC_CONST"
+            },
+            "tester":{
+                "first": {
+                    "type":"STRING_CONST"
+                },
+                "last": {
+                    "type":"STRING_CONST"
+                }
+            },
+            "date":{
+                "type":"STRING_CONST"
             }
         },
         "fluid_reasoning":{

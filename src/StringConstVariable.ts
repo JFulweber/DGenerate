@@ -6,14 +6,17 @@ import {VariableInterpretation} from './VariableInterpretation';
 export class StringConstVariable implements IVariable {
     type: VariableType = VariableType.CONST;
     value: String;
-    dependents: String[];
     json: any;
+    dependents_str: String[];
+    dependents: IVariable[];
+
     constructor(json_input){
         this.json = json_input;
         let {value, dependents} = json_input;
         this.value = value;
-        this.dependents = this.dependents;
+        this.dependents_str = dependents;
     }
+
     interpret(obs: Observation): VariableInterpretation {
         return { description: obs.value };
     }

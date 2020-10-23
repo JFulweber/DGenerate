@@ -4,5 +4,7 @@ import {VariableInterpretation} from './VariableInterpretation';
 
 export interface IVariable {
     type: VariableType;
+    dependents_str: String[];
+    dependents: IVariable[];
     interpret(this: IVariable, obs: Observation ): VariableInterpretation;
 }
