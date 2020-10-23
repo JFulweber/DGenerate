@@ -1,6 +1,8 @@
 {
     "demographics": {
         "gender":"FEMALE",
+        "name":"Ava",
+        "school":"SCU",
         "tester": {
             "first": "Rebecca"
         },

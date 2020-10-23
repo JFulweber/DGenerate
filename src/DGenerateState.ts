@@ -18,6 +18,8 @@ export function GenerateState(gs: GeneratorSettings): DGenerateState {
     return new DGenerateState(gs);
 }
 
+const templateRegex = new RegExp(/\${(.*?)}/);
+
 export class DGenerateState {
     variableMap: Map<String, IVariable>;
     combinedMap: Map<String, VariableInterpretation>;
@@ -106,6 +108,26 @@ export class DGenerateState {
                 }
             }
         }
+    }
+
+    replaceText(template_text: String): String {
+        let out: String;
+        /*
+            need to:
+                find all occurances of 'template-text'
+                CURRENTLY template text will be in the form of ${<variable name>}
+                need to stream text?
+                when we find the starting characters, look for the rest of them?
+        */
+        let previous = null;
+        while(previous != template_text){
+            previous = template_text;
+            template_text = template_text.replace(templateRegex, (match, group, e, f, g) => {
+                return this.combinedMap.get(group).description;
+            })
+        }
+        out = template_text;
+        return out;
     }
 }
 

@@ -70,14 +70,14 @@ describe('Interpretation', function(){
     describe('Interpret Conditionals', function(){
         describe("Numeric", function(){
             it("Should return range from obs.value", ()=>{
-                let fluid_reasoning = state.getIVariable("fluid_reasoning");
+                let fluid_reasoning = state.getIVariable("fluid_reasoning_interp");
                 let result = fluid_reasoning.interpret({variable_name:"fluid_reasoning", value:20});
                 assert(result.description=='average');
             })
         })
         describe("String", function(){
             it("Should return result of switch statement", ()=>{
-                let pronouns = state.getIVariable("demographics.pronouns");
+                let pronouns = state.getIVariable("demographics.pronouns.personal.upper");
                 let result = pronouns.interpret({variable_name:"pronouns", value:"MALE"});
             })
         })
@@ -102,7 +102,15 @@ describe("Combining", ()=>{
         })
         it("Should define dependents in CombinedState", ()=>{
             state.evaluateDependents();
-            console.log(state.combinedMap);
         })
+    })
+})
+
+describe("Text Replacement", ()=>{
+    it("Should not replace un-templated text", ()=>{
+        console.log(state.replaceText("hi my name jeff"));
+    })
+    it("Should replace templated text",()=>{
+        console.log(state.replaceText(`\${demographics.name} is a student at \${demographics.school}. \${demographics.pronouns.possessive.upper} grades are \${fluid_reasoning_interp}.`))
     })
 })
