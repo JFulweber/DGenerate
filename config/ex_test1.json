@@ -1,0 +1,25 @@
+{
+    "variables": {
+        "fluid_reasoning":{
+            "type":"NUMERIC_CONST",
+            "dependents":["fluid_reasoning_interp"]
+        },
+        "fluid_reasoning_interp":{
+            "type":"NUMERIC_COND",
+            "values":[
+                {
+                    "key": 0,
+                    "value": "very low"
+                },
+                {
+                    "key": 10,
+                    "value": "low"
+                },
+                {
+                    "key": 20,
+                    "value": "average"
+                }
+            ]
+        }
+    }
+}

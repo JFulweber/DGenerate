@@ -22,20 +22,28 @@ const templateRegex = new RegExp(/\${(.*?)}/);
 
 export class DGenerateState {
     variableMap: Map<String, IVariable>;
-    combinedMap: Map<String, VariableInterpretation>;
+    combinedMap: Map<String, String>;
     inputMap: Map<String, Observation>;
     constructor(settings: GeneratorSettings) {
-        let { observations, variable_definitions_json: vdef_json } = settings;
+        let { observations, variable_definitions_json_arr} = settings;
+        let combinedJson = {}
+        console.log("Pre for loop")
+        for(var vdefObj of variable_definitions_json_arr){
+            console.log(vdefObj);
+            mergeJSON(combinedJson, vdefObj);
+        }
+        console.log("COMBINED JSON!");
+        console.log(combinedJson);
         /* need to:
             put all vdef into their respective variable types
             then, interpret all observations
             put the results keyed by fully qualified names into state
         */
         let state: Map<String, IVariable> = new Map<String, IVariable>();
-        if (!vdef_json.variables) {
+        if (!combinedJson.variables) {
             return null;
         }
-        let { variables: vdef } = vdef_json;
+        let { variables: vdef } = combinedJson;
         RecursiveDescender(vdef, "", state, (e) => e.type != null, CreateVariableInstance);
         this.variableMap = state;
     }
@@ -48,7 +56,7 @@ export class DGenerateState {
         return this.inputMap.get(name);
     }
 
-    getInterpreted(name: String): VariableInterpretation {
+    getInterpreted(name: String): String {
         return this.combinedMap.get(name);
     }
 
@@ -79,12 +87,12 @@ export class DGenerateState {
         return true;
     }
 
-    combine(): Map<String, VariableInterpretation> {
-        let combinedMap = new Map<String, VariableInterpretation>();
+    combine(): Map<String, String> {
+        let combinedMap = new Map<String, String>();
         for (var [k, v] of this.inputMap) {
             let obs = v;
             let IVar = this.getIVariable(k);
-            combinedMap.set(k, IVar.interpret(obs));
+            combinedMap.set(k, IVar.interpret(obs).description);
         }
         this.combinedMap = combinedMap;
         return combinedMap;
@@ -103,8 +111,8 @@ export class DGenerateState {
                     */
                     let dep_IVar = this.getIVariable(dep_str);
                     let obs = new Observation();
-                    obs.value = varInterp.description;
-                    this.combinedMap.set(dep_str, dep_IVar.interpret(obs));
+                    obs.value = varInterp;
+                    this.combinedMap.set(dep_str, dep_IVar.interpret(obs).description);
                 }
             }
         }
@@ -167,3 +175,26 @@ function RecursiveDescender(input, qualified_name: String, state: Map<string, an
         }
     }
 }
+
+function mergeJSON (target, add) {
+    function isObject(obj) {
+        if (typeof obj == "object") {
+            for (var key in obj) {
+                if (obj.hasOwnProperty(key)) {
+                    return true; // search for first object prop
+                }
+            }
+        }
+        return false;
+    }
+    for (var key in add) {
+        if (add.hasOwnProperty(key)) {
+            if (target[key] && isObject(target[key]) && isObject(add[key])) {
+                mergeJSON(target[key], add[key]);
+            } else {
+                target[key] = add[key];
+            }
+        }
+    }
+    return target;
+};
