@@ -13,27 +13,49 @@ import { inspect } from 'util';
 import { VariableInterpretation } from './VariableInterpretation';
 import { Observation } from './Observation';
 import { throws } from 'assert';
+import { TestInfo } from './TestInfo';
+import { exception } from 'console';
+import {saveAs} from 'file-saver';
+
+
+const Docxtemplater = require('docxtemplater');
+const DocxMerger = require('docx-merger');
+// const fs = require('fs');
+const PizZip = require('pizzip');
 
 export function GenerateState(gs: GeneratorSettings): DGenerateState {
     return new DGenerateState(gs);
 }
 
-const templateRegex = new RegExp(/\${(.*?)}/);
+const templateRegex = new RegExp(/{(.*?)}/);
 
 export class DGenerateState {
-    variableMap: Map<String, IVariable>;
-    combinedMap: Map<String, String>;
-    inputMap: Map<String, Observation>;
+    variableMap: Map<string, IVariable>;
+    combinedMap: Map<string, string>;
+    inputMap: Map<string, Observation>;
+    observation_json: Object[];
+    observation_map: Map<string,any>;
+    template_files: string[];
+    output_name: string;
+    testInfo_array: TestInfo[] = [];
     constructor(settings: GeneratorSettings) {
-        let { observations, variable_definitions_json_arr} = settings;
+        let { observation_json, variable_definitions_json_arr, template_files, output_name } = settings;
+        this.template_files = template_files;
+        this.output_name = output_name;
+        
         let combinedJson = {}
-        console.log("Pre for loop")
-        for(var vdefObj of variable_definitions_json_arr){
-            console.log(vdefObj);
+        for (var vdefName in variable_definitions_json_arr) {
+            console.log(vdefName);
+            let vdefObj = variable_definitions_json_arr[vdefName];
+            if (vdefObj.testInfo) {
+                let testInfo = new TestInfo();
+                testInfo.summary = vdefObj.testInfo.summary;
+                testInfo.testName = vdefObj.testInfo.testName;
+                testInfo.qualified_name = vdefObj.testInfo.qualified_name;
+                this.testInfo_array.push(testInfo);
+            }
             mergeJSON(combinedJson, vdefObj);
         }
-        console.log("COMBINED JSON!");
-        console.log(combinedJson);
         /* need to:
             put all vdef into their respective variable types
             then, interpret all observations
@@ -44,8 +66,16 @@ export class DGenerateState {
             return null;
         }
         let { variables: vdef } = combinedJson;
-        RecursiveDescender(vdef, "", state, (e) => e.type != null, CreateVariableInstance);
+        RecursiveDescender(vdef, "", state, (e) => true && e.type, CreateVariableInstance);
         this.variableMap = state;
+        if(observation_json)
+            this.observation_json = observation_json;
+        else if(observation_map){
+            this.observation_map = observation_map;
+        }
+        else{
+            throw new Error("Missing observation map and observation json, are you running this with invalid/incorrect/missing input?")
+        }
     }
 
     getIVariable(name: String): IVariable {
@@ -99,6 +129,8 @@ export class DGenerateState {
     }
 
     evaluateDependents() {
+        console.log(this);
+        console.log('yes')
         for (var [k, v] of this.variableMap) {
             if (v.dependents_str != null && v.dependents_str.length != 0) {
                 let varInterp = this.combinedMap.get(k);
@@ -118,8 +150,8 @@ export class DGenerateState {
         }
     }
 
-    replaceText(template_text: String): String {
-        let out: String;
+    replaceText(template_text: string): string {
+        let out: string;
         /*
             need to:
                 find all occurances of 'template-text'
@@ -128,14 +160,66 @@ export class DGenerateState {
                 when we find the starting characters, look for the rest of them?
         */
         let previous = null;
-        while(previous != template_text){
+        while (previous != template_text) {
             previous = template_text;
             template_text = template_text.replace(templateRegex, (match, group, e, f, g) => {
-                return this.combinedMap.get(group).description;
+                return this.combinedMap.get(group);
             })
         }
         out = template_text;
         return out;
+    }
+
+    run(): any {
+        if(this.observation_json)
+            this.getInputMap(this.observation_json);
+        else{
+            this.inputMap=this.observation_map;
+        }
+        this.checkInputAgainstDefinition();
+        this.combine();
+        this.evaluateDependents();
+        console.log("combined map")
+        console.log(this.combinedMap);
+        let testInfo: Object[] = this.testInfo_array.map(e => {
+            console.log("qual name: " , e.qualified_name);
+            return {
+                testName: e.testName,
+                summary: this.replaceText(e.summary),
+                date: this.combinedMap.get(e.qualified_name + ".date")
+            }
+        });
+        let obj = Array.from(this.combinedMap).reduce((obj: Object, [key, value]) => {
+            obj[key] = value;
+            return obj;
+        }, {});
+        obj.testInfo = testInfo;
+        var merged = new DocxMerger({pageBreak: false}, this.template_files);
+        merged.save('nodebuffer', (data) => {
+            // fs.writeFileSync("output/merged.docx", data);
+            var zip = PizZip(data);
+            // var zip = PizZip(this.template_files[0]);
+            try {
+                let docx = new Docxtemplater(zip);
+                docx.setData(obj);
+                docx.render();
+                console.log("completed docx render -> saving to buffer?")
+                var buf = docx.getZip().generate({ type: 'blob',                mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+                // fs.writeFileSync(this.output_name, buf);
+                // console.log(buf)
+                console.log(saveAs);
+                saveAs(buf,"output.docx")
+                console.log(buf)
+                return buf;
+            }
+            catch (e) {
+                if (e.properties && e.properties.errors) {
+                    e.properties.errors.forEach(element => {
+                        console.log(element)
+                    });
+                }
+            }
+        })
     }
 }
 
@@ -158,7 +242,7 @@ function CreateVariableInstance(jsonInput: UnparsedVariableJson): IVariable {
     return out;
 }
 
-function RecursiveDescender(input, qualified_name: String, state: Map<string, any>, compareFunc, successFunc) {
+function RecursiveDescender(input, qualified_name: string, state: Map<string, any>, compareFunc, successFunc) {
     /*
         need to:
             look for variables in the children
@@ -170,13 +254,15 @@ function RecursiveDescender(input, qualified_name: String, state: Map<string, an
         state.set(qualified_name, successFunc(input));
     }
     else {
+        console.log(input);
         for (var section_name in input) {
-            RecursiveDescender(input[section_name], `${qualified_name}${qualified_name != "" ? "." : ""}${section_name}`, state, compareFunc, successFunc);
+            if(section_name!="testInfo")
+                RecursiveDescender(input[section_name], `${qualified_name}${qualified_name != "" ? "." : ""}${section_name}`, state, compareFunc, successFunc);
         }
     }
 }
 
-function mergeJSON (target, add) {
+function mergeJSON(target, add) {
     function isObject(obj) {
         if (typeof obj == "object") {
             for (var key in obj) {

@@ -9,7 +9,7 @@ import {Observation} from './Observation';
 import {VariableConditional} from './VariableConditional';
 import {VariableInterpretation} from './VariableInterpretation';
 
-export default {
+export {
     DGenerateState,
     VariableType,
     GeneratorSettings,

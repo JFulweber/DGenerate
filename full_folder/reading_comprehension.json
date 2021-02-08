@@ -1,0 +1,68 @@
+{
+    "variables":{
+        "reading_comprehension":{
+            "date":{
+                "type":"STRING_CONST"
+            },
+            "vocabulary":{
+                "score":{
+                    "type":"NUMERIC_CONST",
+                    "dependents":["reading_comprehension.vocabulary.interp"]
+                },
+                "interp":{
+                    "type":"NUMERIC_COND",
+                    "values": [
+                        {
+                            "key": 0,
+                            "value": "bad vocabulary"
+                        },
+                        {
+                            "key": 10,
+                            "value": "below average vocab"
+                        },
+                        {
+                            "key": 20,
+                            "value": "average"
+                        },
+                        {
+                            "key": 30,
+                            "value": "decent vocab"
+                        },
+                        {
+                            "key": 40,
+                            "value":"good vocab"
+                        }
+                    ]
+                }
+            },
+            "reading_speed":{
+                "score":{
+                    "type":"NUMERIC_CONST",
+                    "dependents":["reading_comprehension.reading_speed.interp"]
+                },
+                "interp":{
+                    "type":"NUMERIC_COND",
+                    "values":[
+                        {
+                            "key":0,
+                            "value":"slow reader"
+                        },
+                        {
+                            "key":10,
+                            "value":"ok reader"
+                        },
+                        {
+                            "key":20,
+                            "value":"fast reader"
+                        }
+                    ]
+                }
+            }
+        }
+    },
+    "testInfo":{
+        "testName":"Reading Comprehension",
+        "qualified_name":"reading_comprehension",
+        "summary":"For the reading comprehension test, {demographics.name}'s is a {reading_comprehension.reading_speed.interp} (score of {reading_comprehension.reading_speed.score}), with a {reading_comprehension.vocabulary.interp} (score of {reading_comprehension.vocabulary.score})."
+    }
+}

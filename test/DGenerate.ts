@@ -9,7 +9,11 @@ import { IVariable } from '../src/IVariable';
 import { Observation } from '../src/Observation';
 var yargs = require('yargs');
 var { argv } = yargs;
-var fs = require('fs');
+import * as fs from 'fs';
+var Docxtemplater = require('Docxtemplater');
+var DocxMerger = require('docx-merger');
+var PizZip = require('pizzip');
+
 var assert = require('assert');
 
 // if(!argv.input || !argv.config){
@@ -17,21 +21,27 @@ var assert = require('assert');
 //     exit(-1);
 // }
 let inputFilename = "input/input.json";
-let configFilenames = ["config/demographics.json", "config/ex_test1.json"];
+let configFilenames = ["config/demographics.json", "config/ex_test1.json","config/reading_comprehension.json"];
 let configFiles = [];
 for (var v of configFilenames) {
+    console.log(v);
     configFiles.push(JSON.parse(fs.readFileSync(v)));
 }
 
 let inputFile = JSON.parse(fs.readFileSync(inputFilename));
+let templateFiles = [];
+templateFiles.push(fs.readFileSync("templates/header.docx"));
+templateFiles.push(fs.readFileSync("templates/demographics.docx"));
+templateFiles.push(fs.readFileSync("templates/test.docx"));
+templateFiles.push(fs.readFileSync("templates/reading_comprehension.docx"));
+templateFiles.push(fs.readFileSync("templates/summaries.docx"));
 
 let state: DGenerateState;
 
 describe('GeneratorSettings', function () {
     describe('GenerateState', function () {
         it("Should do something!", () => {
-            console.log("Generating state...")
-            state = GenerateState({ observations: inputFile, variable_definitions_json_arr: configFiles });
+            state = GenerateState({ observation_json: inputFile, variable_definitions_json_arr: configFiles, template_files: templateFiles, output_name: "output/output.docx" });
         })
     })
 });
@@ -76,8 +86,8 @@ describe('Interpretation', function () {
     describe('Interpret Conditionals', function () {
         describe("Numeric", function () {
             it("Should return range from obs.value", () => {
-                let fluid_reasoning = state.getIVariable("fluid_reasoning_interp");
-                let result = fluid_reasoning.interpret({ variable_name: "fluid_reasoning", value: 20 });
+                let fluid_reasoning = state.getIVariable("fluid_reasoning.score");
+                let result = fluid_reasoning.interpret({ variable_name: "fluid_reasoning.score", value: 20 });
                 assert(result.description == 'average');
             })
         })
@@ -103,7 +113,7 @@ describe("Combining", () => {
             state.combine()
             for (var [k, v] of state.combinedMap) {
                 assert(v, `${k} null`)
-                assert(v && v.description != undefined, `${k} description undefined`);
+                assert(v, `${k} description undefined`);
             }
         })
         it("Should define dependents in CombinedState", () => {
@@ -121,32 +131,10 @@ describe("Text Replacement", () => {
     })
 })
 
-var Docxtemplater = require('Docxtemplater');
-var PizZip = require('pizzip');
-var fs = require('fs');
-
-
-describe("Docx4js file loading", () => {
-    var docx: Docxtemplater;
-    it("Should print Docxtemplater obj", () => {
-        var content = fs
-            .readFileSync("templates/demographics.docx", 'binary');
-        var zip = PizZip(content);
-        docx = new Docxtemplater(zip);
-    })
-    it("Can replace content?", () => {
-        let obj = Array.from(state.combinedMap).reduce((obj: Object, [key, value]) => {
-            obj[key] = value;
-            return obj;
-        }, {});
-        console.log(obj);
-        docx.setData(obj);
-        docx.render();
-        var buf = docx.getZip()
-            .generate({ type: 'nodebuffer' });
-
-        // buf is a nodejs buffer, you can either write it to a file or do anything else with it.
-        fs.writeFileSync("output/output.docx", buf);
+describe("Docxtemplater file loading", () => {
+    it("Outputs", () => {
+        state.run();
+        assert(fs.existsSync(state.output_name),`Output filename ${state.output_name} does not exist`);
     })
 })
 
