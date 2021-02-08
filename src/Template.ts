@@ -6,6 +6,5 @@ import { VariableInterpretation } from "./VariableInterpretation";
 
 export function ApplyTemplate(observation: Observation, variable: IVariable): VariableInterpretation{
     let result = variable.interpret(observation);
-    console.log(result);
     return null;
 }

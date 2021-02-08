@@ -1,0 +1,7 @@
+{
+    "variables":{
+        "test":{
+            "type":"STRING_CONST"
+        }
+    }
+}

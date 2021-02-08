@@ -26,6 +26,9 @@ var __read = (this && this.__read) || function (o, n) {
     }
     return ar;
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DGenerateState = exports.GenerateState = void 0;
 var NumericConditionalVariable_1 = require("./NumericConditionalVariable");
@@ -34,7 +37,7 @@ var StringConditionalVariable_1 = require("./StringConditionalVariable");
 var StringConstVariable_1 = require("./StringConstVariable");
 var Observation_1 = require("./Observation");
 var TestInfo_1 = require("./TestInfo");
-var file_saver_1 = require("file-saver");
+var fs_1 = __importDefault(require("fs"));
 var Docxtemplater = require('docxtemplater');
 var DocxMerger = require('docx-merger');
 // const fs = require('fs');
@@ -52,7 +55,6 @@ var DGenerateState = /** @class */ (function () {
         this.output_name = output_name;
         var combinedJson = {};
         for (var vdefName in variable_definitions_json_arr) {
-            console.log(vdefName);
             var vdefObj = variable_definitions_json_arr[vdefName];
             if (vdefObj.testInfo) {
                 var testInfo = new TestInfo_1.TestInfo();
@@ -154,8 +156,6 @@ var DGenerateState = /** @class */ (function () {
     };
     DGenerateState.prototype.evaluateDependents = function () {
         var e_3, _a, e_4, _b;
-        console.log(this);
-        console.log('yes');
         try {
             for (var _c = __values(this.variableMap), _d = _c.next(); !_d.done; _d = _c.next()) {
                 var _e = __read(_d.value, 2), k = _e[0], v = _e[1];
@@ -224,10 +224,7 @@ var DGenerateState = /** @class */ (function () {
         this.checkInputAgainstDefinition();
         this.combine();
         this.evaluateDependents();
-        console.log("combined map");
-        console.log(this.combinedMap);
         var testInfo = this.testInfo_array.map(function (e) {
-            console.log("qual name: ", e.qualified_name);
             return {
                 testName: e.testName,
                 summary: _this.replaceText(e.summary),
@@ -249,14 +246,8 @@ var DGenerateState = /** @class */ (function () {
                 var docx = new Docxtemplater(zip);
                 docx.setData(obj);
                 docx.render();
-                console.log("completed docx render -> saving to buffer?");
-                var buf = docx.getZip().generate({ type: 'blob', mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
-                // fs.writeFileSync(this.output_name, buf);
-                // console.log(buf)
-                console.log(file_saver_1.saveAs);
-                file_saver_1.saveAs(buf, "output.docx");
-                console.log(buf);
-                return buf;
+                var buf = docx.getZip().generate({ type: 'nodebuffer', mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+                fs_1.default.writeFileSync(_this.output_name, buf);
             }
             catch (e) {
                 if (e.properties && e.properties.errors) {
@@ -300,7 +291,6 @@ function RecursiveDescender(input, qualified_name, state, compareFunc, successFu
         state.set(qualified_name, successFunc(input));
     }
     else {
-        console.log(input);
         for (var section_name in input) {
             if (section_name != "testInfo")
                 RecursiveDescender(input[section_name], "" + qualified_name + (qualified_name != "" ? "." : "") + section_name, state, compareFunc, successFunc);

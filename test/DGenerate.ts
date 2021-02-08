@@ -24,7 +24,6 @@ let inputFilename = "input/input.json";
 let configFilenames = ["config/demographics.json", "config/ex_test1.json","config/reading_comprehension.json"];
 let configFiles = [];
 for (var v of configFilenames) {
-    console.log(v);
     configFiles.push(JSON.parse(fs.readFileSync(v)));
 }
 

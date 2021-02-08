@@ -16,7 +16,7 @@ import { throws } from 'assert';
 import { TestInfo } from './TestInfo';
 import { exception } from 'console';
 import {saveAs} from 'file-saver';
-
+import fs from 'fs';
 
 const Docxtemplater = require('docxtemplater');
 const DocxMerger = require('docx-merger');
@@ -45,7 +45,6 @@ export class DGenerateState {
         
         let combinedJson = {}
         for (var vdefName in variable_definitions_json_arr) {
-            console.log(vdefName);
             let vdefObj = variable_definitions_json_arr[vdefName];
             if (vdefObj.testInfo) {
                 let testInfo = new TestInfo();
@@ -129,8 +128,6 @@ export class DGenerateState {
     }
 
     evaluateDependents() {
-        console.log(this);
-        console.log('yes')
         for (var [k, v] of this.variableMap) {
             if (v.dependents_str != null && v.dependents_str.length != 0) {
                 let varInterp = this.combinedMap.get(k);
@@ -179,10 +176,7 @@ export class DGenerateState {
         this.checkInputAgainstDefinition();
         this.combine();
         this.evaluateDependents();
-        console.log("combined map")
-        console.log(this.combinedMap);
         let testInfo: Object[] = this.testInfo_array.map(e => {
-            console.log("qual name: " , e.qualified_name);
             return {
                 testName: e.testName,
                 summary: this.replaceText(e.summary),
@@ -203,14 +197,8 @@ export class DGenerateState {
                 let docx = new Docxtemplater(zip);
                 docx.setData(obj);
                 docx.render();
-                console.log("completed docx render -> saving to buffer?")
-                var buf = docx.getZip().generate({ type: 'blob',                mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
-                // fs.writeFileSync(this.output_name, buf);
-                // console.log(buf)
-                console.log(saveAs);
-                saveAs(buf,"output.docx")
-                console.log(buf)
-                return buf;
+                var buf = docx.getZip().generate({ type: 'nodebuffer',                mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+                fs.writeFileSync(this.output_name, buf);
             }
             catch (e) {
                 if (e.properties && e.properties.errors) {
@@ -254,7 +242,6 @@ function RecursiveDescender(input, qualified_name: string, state: Map<string, an
         state.set(qualified_name, successFunc(input));
     }
     else {
-        console.log(input);
         for (var section_name in input) {
             if(section_name!="testInfo")
                 RecursiveDescender(input[section_name], `${qualified_name}${qualified_name != "" ? "." : ""}${section_name}`, state, compareFunc, successFunc);
