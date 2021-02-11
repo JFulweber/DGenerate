@@ -1,6 +1,6 @@
 {
   "name": "dgenerate",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "Document templating system made for test report generation - WIP",
   "main": "build/index.js",
   "scripts": {
