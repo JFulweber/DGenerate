@@ -9,6 +9,8 @@ import {Observation} from './Observation';
 import {VariableConditional} from './VariableConditional';
 import {VariableInterpretation} from './VariableInterpretation';
 
+require('source-map-support').install();
+
 export {
     DGenerateState,
     VariableType,
