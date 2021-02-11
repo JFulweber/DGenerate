@@ -127,6 +127,11 @@ describe("Docxtemplater file loading", () => {
         state.run();
         return true;
         // assert(fs.existsSync(state.output_name),`Output filename ${state.output_name} does not exist`);
+    });
+    it("Returns buffer when not given name",()=>{
+        let new_state = GenerateState({ observation_json: inputFile, variable_definitions_json_arr: configFiles, template_files: templateFiles, output_name: undefined, observation_map:undefined });
+        let buf = new_state.run();
+        assert(buf!=null);
     })
 })
 

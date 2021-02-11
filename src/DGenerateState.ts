@@ -192,6 +192,8 @@ export class DGenerateState {
         }, {});
         obj.testInfoArr = testInfoArr;
         var merged = new DocxMerger({pageBreak: false}, this.template_files);
+        let hasOutputName = this.output_name || false;
+        let buf = null;
         merged.save('nodebuffer', (data) => {
             // fs.writeFileSync("output/merged.docx", data);
             var zip = PizZip(data);
@@ -200,9 +202,13 @@ export class DGenerateState {
                 let docx = new Docxtemplater(zip);
                 docx.setData(obj);
                 docx.render();
-                var buf = docx.getZip().generate({ type: 'nodebuffer',                mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
-                fs.writeFileSync(this.output_name, buf);
-            }
+                buf = docx.getZip().generate({ type: 'nodebuffer',                mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+                if(hasOutputName){
+                    fs.writeFileSync(this.output_name, buf);
+                }
+                else{
+                    return;
+                }                             }
             catch (e) {
                 if (e.properties && e.properties.errors) {
                     e.properties.errors.forEach(element => {
@@ -211,6 +217,7 @@ export class DGenerateState {
                 }
             }
         })
+        return buf;
     }
 }
 
