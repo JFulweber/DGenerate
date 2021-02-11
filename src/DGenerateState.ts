@@ -212,7 +212,7 @@ export class DGenerateState {
             catch (e) {
                 if (e.properties && e.properties.errors) {
                     e.properties.errors.forEach(element => {
-                        console.log(element)
+                        throw element;
                     });
                 }
             }

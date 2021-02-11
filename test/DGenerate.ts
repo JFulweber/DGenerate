@@ -115,10 +115,13 @@ describe("Combining", () => {
 
 describe("Text Replacement", () => {
     it("Should not replace un-templated text", () => {
-        console.log(state.replaceText("hi my name jeff"));
+        assert(state.replaceText("hi my name jeff")=="hi my name jeff");
     })
     it("Should replace templated text", () => {
-        console.log(state.replaceText(`\${demographics.name} is a student at \${demographics.school}. \${demographics.pronouns.possessive.upper} grades are \${fluid_reasoning_interp}.`))
+        let text = `{demographics.name} is a student at {demographics.school}. {demographics.pronouns.possessive.upper} grades are {fluid_reasoning.interp}.`;
+        let replacedText = state.replaceText(text);
+        assert(replacedText=='Ava is a student at SCU. Her grades are low.',replacedText)
+        
     })
 })
 
