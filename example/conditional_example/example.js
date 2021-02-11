@@ -1,4 +1,4 @@
-let {DGenerateState, GenerateState, GeneratorSettings} = require('../..');
+let {DGenerateState, GenerateState, GeneratorSettings} = require('DGenerate');
 let fs = require('fs');
 let templateDocx = fs.readFileSync('./template.docx');
 let templateJson = JSON.parse(fs.readFileSync('./template.json'));

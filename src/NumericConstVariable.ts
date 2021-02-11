@@ -8,7 +8,7 @@ export class NumericConstVariable implements IVariable {
     type: VariableType = VariableType.CONST;
     values: VariableConditional[];
     json: any;
-    dependents_str: String[];
+    dependents_str: string[];
     dependents: IVariable[];
 
     constructor(json_input){

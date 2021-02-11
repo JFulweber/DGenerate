@@ -5,9 +5,9 @@ import {VariableInterpretation} from './VariableInterpretation';
 
 export class StringConstVariable implements IVariable {
     type: VariableType = VariableType.CONST;
-    value: String;
+    value: string;
     json: any;
-    dependents_str: String[];
+    dependents_str: string[];
     dependents: IVariable[];
 
     constructor(json_input){

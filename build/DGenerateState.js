@@ -38,6 +38,7 @@ var StringConstVariable_1 = require("./StringConstVariable");
 var Observation_1 = require("./Observation");
 var TestInfo_1 = require("./TestInfo");
 var fs_1 = __importDefault(require("fs"));
+var JSONArr_1 = require("./JSONArr");
 var Docxtemplater = require('docxtemplater');
 var DocxMerger = require('docx-merger');
 // const fs = require('fs');
@@ -50,10 +51,10 @@ var templateRegex = new RegExp(/{(.*?)}/);
 var DGenerateState = /** @class */ (function () {
     function DGenerateState(settings) {
         this.testInfo_array = [];
-        var observation_json = settings.observation_json, variable_definitions_json_arr = settings.variable_definitions_json_arr, template_files = settings.template_files, output_name = settings.output_name;
+        var observation_json = settings.observation_json, observation_map = settings.observation_map, variable_definitions_json_arr = settings.variable_definitions_json_arr, template_files = settings.template_files, output_name = settings.output_name;
         this.template_files = template_files;
         this.output_name = output_name;
-        var combinedJson = {};
+        var combinedJson = new JSONArr_1.JSONArr();
         for (var vdefName in variable_definitions_json_arr) {
             var vdefObj = variable_definitions_json_arr[vdefName];
             if (vdefObj.testInfo) {
@@ -224,11 +225,12 @@ var DGenerateState = /** @class */ (function () {
         this.checkInputAgainstDefinition();
         this.combine();
         this.evaluateDependents();
-        var testInfo = this.testInfo_array.map(function (e) {
+        var testInfoArr = this.testInfo_array.map(function (e) {
             return {
                 testName: e.testName,
                 summary: _this.replaceText(e.summary),
-                date: _this.combinedMap.get(e.qualified_name + ".date")
+                date: _this.combinedMap.get(e.qualified_name + ".date"),
+                qualified_name: e.qualified_name
             };
         });
         var obj = Array.from(this.combinedMap).reduce(function (obj, _a) {
@@ -236,7 +238,7 @@ var DGenerateState = /** @class */ (function () {
             obj[key] = value;
             return obj;
         }, {});
-        obj.testInfo = testInfo;
+        obj.testInfoArr = testInfoArr;
         var merged = new DocxMerger({ pageBreak: false }, this.template_files);
         merged.save('nodebuffer', function (data) {
             // fs.writeFileSync("output/merged.docx", data);

@@ -8,7 +8,7 @@ export class StringConditionalVariable implements IVariable {
     values: VariableConditional[];
     type: VariableType = VariableType.COND;
     json: any;
-    dependents_str: String[];
+    dependents_str: string[];
     dependents: IVariable[];
 
     constructor(json_input) {

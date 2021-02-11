@@ -1,0 +1,25 @@
+{
+    "demographics": {
+        "gender":"FEMALE",
+        "name":"Ava",
+        "school":"SCU",
+        "tester": {
+            "first": "Rebecca"
+        },
+        "date": "09/30/2020",
+        "age":20
+    },
+    "fluid_reasoning": {
+        "score":10,
+        "date":"Today"
+    },
+    "reading_comprehension":{
+        "vocabulary":{ 
+            "score":15
+        },
+        "reading_speed":{
+            "score":5
+        },
+        "date":"09/30/2020"
+    }
+}

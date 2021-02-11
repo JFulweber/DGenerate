@@ -17,6 +17,8 @@ import { TestInfo } from './TestInfo';
 import { exception } from 'console';
 import {saveAs} from 'file-saver';
 import fs from 'fs';
+import { JSONArr } from './JSONArr';
+import { VariableStore } from './VariableStore';
 
 const Docxtemplater = require('docxtemplater');
 const DocxMerger = require('docx-merger');
@@ -39,11 +41,11 @@ export class DGenerateState {
     output_name: string;
     testInfo_array: TestInfo[] = [];
     constructor(settings: GeneratorSettings) {
-        let { observation_json, variable_definitions_json_arr, template_files, output_name } = settings;
+        let { observation_json, observation_map, variable_definitions_json_arr, template_files, output_name } = settings;
         this.template_files = template_files;
         this.output_name = output_name;
         
-        let combinedJson = {}
+        let combinedJson = new JSONArr();
         for (var vdefName in variable_definitions_json_arr) {
             let vdefObj = variable_definitions_json_arr[vdefName];
             if (vdefObj.testInfo) {
@@ -60,7 +62,7 @@ export class DGenerateState {
             then, interpret all observations
             put the results keyed by fully qualified names into state
         */
-        let state: Map<String, IVariable> = new Map<String, IVariable>();
+        let state: Map<string, IVariable> = new Map<string, IVariable>();
         if (!combinedJson.variables) {
             return null;
         }
@@ -77,15 +79,15 @@ export class DGenerateState {
         }
     }
 
-    getIVariable(name: String): IVariable {
+    getIVariable(name: string): IVariable {
         return this.variableMap.get(name);
     }
 
-    getObservation(name: String): Observation {
+    getObservation(name: string): Observation {
         return this.inputMap.get(name);
     }
 
-    getInterpreted(name: String): String {
+    getInterpreted(name: string): string {
         return this.combinedMap.get(name);
     }
 
@@ -95,7 +97,7 @@ export class DGenerateState {
                 get json input into fully qualified observation map
                 from the input -> template -> into combined state
         */
-        let InputState: Map<String, Observation> = new Map<String, Observation>();
+        let InputState: Map<string, Observation> = new Map<string, Observation>();
         RecursiveDescender(json_input, "", InputState, (e) => typeof (e) == "string" || typeof (e) == "number", (e) => {
             let obs = new Observation();
             obs.value = e;
@@ -116,8 +118,8 @@ export class DGenerateState {
         return true;
     }
 
-    combine(): Map<String, String> {
-        let combinedMap = new Map<String, String>();
+    combine(): Map<string, string> {
+        let combinedMap = new Map<string, string>();
         for (var [k, v] of this.inputMap) {
             let obs = v;
             let IVar = this.getIVariable(k);
@@ -176,18 +178,19 @@ export class DGenerateState {
         this.checkInputAgainstDefinition();
         this.combine();
         this.evaluateDependents();
-        let testInfo: Object[] = this.testInfo_array.map(e => {
+        let testInfoArr: TestInfo[] = this.testInfo_array.map(e => {
             return {
                 testName: e.testName,
                 summary: this.replaceText(e.summary),
-                date: this.combinedMap.get(e.qualified_name + ".date")
+                date: this.combinedMap.get(e.qualified_name + ".date"),
+                qualified_name: e.qualified_name
             }
         });
-        let obj = Array.from(this.combinedMap).reduce((obj: Object, [key, value]) => {
+        let obj: VariableStore = Array.from(this.combinedMap).reduce((obj: any, [key, value]) => {
             obj[key] = value;
             return obj;
         }, {});
-        obj.testInfo = testInfo;
+        obj.testInfoArr = testInfoArr;
         var merged = new DocxMerger({pageBreak: false}, this.template_files);
         merged.save('nodebuffer', (data) => {
             // fs.writeFileSync("output/merged.docx", data);
