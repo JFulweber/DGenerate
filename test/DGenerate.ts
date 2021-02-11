@@ -7,7 +7,6 @@ import { GeneratorSettings } from '../src/GeneratorSettings';
 import { IVariable } from '../src/IVariable';
 import { Observation } from '../src/Observation';
 import * as fs from 'fs';
-var Docxtemplater = require('Docxtemplater');
 var DocxMerger = require('docx-merger');
 var PizZip = require('pizzip');
 
