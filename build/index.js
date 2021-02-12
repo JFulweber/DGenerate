@@ -7,4 +7,5 @@ var EVariableType_1 = require("./EVariableType");
 Object.defineProperty(exports, "VariableType", { enumerable: true, get: function () { return EVariableType_1.VariableType; } });
 var GeneratorSettings_1 = require("./GeneratorSettings");
 Object.defineProperty(exports, "GeneratorSettings", { enumerable: true, get: function () { return GeneratorSettings_1.GeneratorSettings; } });
+require('source-map-support').install();
 //# sourceMappingURL=index.js.map

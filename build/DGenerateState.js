@@ -240,6 +240,8 @@ var DGenerateState = /** @class */ (function () {
         }, {});
         obj.testInfoArr = testInfoArr;
         var merged = new DocxMerger({ pageBreak: false }, this.template_files);
+        var hasOutputName = this.output_name || false;
+        var buf = null;
         merged.save('nodebuffer', function (data) {
             // fs.writeFileSync("output/merged.docx", data);
             var zip = PizZip(data);
@@ -248,17 +250,23 @@ var DGenerateState = /** @class */ (function () {
                 var docx = new Docxtemplater(zip);
                 docx.setData(obj);
                 docx.render();
-                var buf = docx.getZip().generate({ type: 'nodebuffer', mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
-                fs_1.default.writeFileSync(_this.output_name, buf);
+                buf = docx.getZip().generate({ type: 'nodebuffer', mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+                if (hasOutputName) {
+                    fs_1.default.writeFileSync(_this.output_name, buf);
+                }
+                else {
+                    return;
+                }
             }
             catch (e) {
                 if (e.properties && e.properties.errors) {
                     e.properties.errors.forEach(function (element) {
-                        console.log(element);
+                        throw element;
                     });
                 }
             }
         });
+        return buf;
     };
     return DGenerateState;
 }());
