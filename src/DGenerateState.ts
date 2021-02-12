@@ -39,12 +39,12 @@ export class DGenerateState {
     observation_map: Map<string,any>;
     template_files: string[];
     output_name: string;
-    testInfo_array: TestInfo[] = [];
+    testInfo_array: TestInfo[];
     constructor(settings: GeneratorSettings) {
         let { observation_json, observation_map, variable_definitions_json_arr, template_files, output_name } = settings;
         this.template_files = template_files;
         this.output_name = output_name;
-        
+        this.testInfo_array = [];
         let combinedJson = new JSONArr();
         for (var vdefName in variable_definitions_json_arr) {
             let vdefObj = variable_definitions_json_arr[vdefName];

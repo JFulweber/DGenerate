@@ -50,10 +50,10 @@ exports.GenerateState = GenerateState;
 var templateRegex = new RegExp(/{(.*?)}/);
 var DGenerateState = /** @class */ (function () {
     function DGenerateState(settings) {
-        this.testInfo_array = [];
         var observation_json = settings.observation_json, observation_map = settings.observation_map, variable_definitions_json_arr = settings.variable_definitions_json_arr, template_files = settings.template_files, output_name = settings.output_name;
         this.template_files = template_files;
         this.output_name = output_name;
+        this.testInfo_array = [];
         var combinedJson = new JSONArr_1.JSONArr();
         for (var vdefName in variable_definitions_json_arr) {
             var vdefObj = variable_definitions_json_arr[vdefName];
