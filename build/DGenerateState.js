@@ -51,6 +51,7 @@ var templateRegex = new RegExp(/{(.*?)}/);
 var DGenerateState = /** @class */ (function () {
     function DGenerateState(settings) {
         var observation_json = settings.observation_json, observation_map = settings.observation_map, variable_definitions_json_arr = settings.variable_definitions_json_arr, template_files = settings.template_files, output_name = settings.output_name;
+        variable_definitions_json_arr = variable_definitions_json_arr.map(function (v) { return Object.assign({}, v); });
         this.template_files = template_files;
         this.output_name = output_name;
         this.testInfo_array = [];

@@ -42,6 +42,7 @@ export class DGenerateState {
     testInfo_array: TestInfo[];
     constructor(settings: GeneratorSettings) {
         let { observation_json, observation_map, variable_definitions_json_arr, template_files, output_name } = settings;
+        variable_definitions_json_arr = variable_definitions_json_arr.map(v=>Object.assign({},v));
         this.template_files = template_files;
         this.output_name = output_name;
         this.testInfo_array = [];
