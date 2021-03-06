@@ -48,7 +48,7 @@ export class DGenerateState {
         this.testInfo_array = [];
         let combinedJson = new JSONArr();
         for (var vdefName in variable_definitions_json_arr) {
-            let vdefObj = variable_definitions_json_arr[vdefName];
+            let vdefObj = Object.assign({},variable_definitions_json_arr[vdefName]);
             if (vdefObj.testInfo) {
                 let testInfo = new TestInfo();
                 testInfo.summary = vdefObj.testInfo.summary;
