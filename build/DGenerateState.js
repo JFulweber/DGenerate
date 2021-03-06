@@ -48,16 +48,42 @@ function GenerateState(gs) {
 }
 exports.GenerateState = GenerateState;
 var templateRegex = new RegExp(/{(.*?)}/);
+function cloneObj(obj, deep) {
+    if (deep === void 0) { deep = false; }
+    var result = {};
+    for (var key in obj) {
+        if (deep && obj[key] instanceof Object) {
+            if (obj[key] instanceof Array) {
+                result[key] = [];
+                obj[key].forEach(function (item) {
+                    if (item instanceof Object) {
+                        result[key].push(cloneObj(item, true));
+                    }
+                    else {
+                        result[key].push(item);
+                    }
+                });
+            }
+            else {
+                result[key] = cloneObj(obj[key]);
+            }
+        }
+        else {
+            result[key] = obj[key];
+        }
+    }
+    return result;
+}
 var DGenerateState = /** @class */ (function () {
     function DGenerateState(settings) {
         var observation_json = settings.observation_json, observation_map = settings.observation_map, variable_definitions_json_arr = settings.variable_definitions_json_arr, template_files = settings.template_files, output_name = settings.output_name;
-        variable_definitions_json_arr = variable_definitions_json_arr.map(function (v) { return Object.assign({}, v); });
+        variable_definitions_json_arr = variable_definitions_json_arr.map(function (v) { return cloneObj(v, true); });
         this.template_files = template_files;
         this.output_name = output_name;
         this.testInfo_array = [];
         var combinedJson = new JSONArr_1.JSONArr();
         for (var vdefName in variable_definitions_json_arr) {
-            var vdefObj = variable_definitions_json_arr[vdefName];
+            var vdefObj = Object.assign({}, variable_definitions_json_arr[vdefName]);
             if (vdefObj.testInfo) {
                 var testInfo = new TestInfo_1.TestInfo();
                 testInfo.summary = vdefObj.testInfo.summary;

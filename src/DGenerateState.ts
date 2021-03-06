@@ -31,6 +31,29 @@ export function GenerateState(gs: GeneratorSettings): DGenerateState {
 
 const templateRegex = new RegExp(/{(.*?)}/);
 
+function cloneObj<T>(obj, deep=false): T{
+    var result = {};
+    for(var key in obj){
+      if(deep && obj[key] instanceof Object){
+         if(obj[key] instanceof Array){
+           result[key] = [];
+           obj[key].forEach(function(item){
+              if(item instanceof Object){
+                 result[key].push(cloneObj(item, true));
+              } else {
+                 result[key].push(item);
+              }
+           });
+         } else {
+           result[key] = cloneObj(obj[key]);
+         }
+      } else {
+         result[key] = obj[key];
+      }
+    }
+    return result;
+  }
+
 export class DGenerateState {
     variableMap: Map<string, IVariable>;
     combinedMap: Map<string, string>;
@@ -42,7 +65,7 @@ export class DGenerateState {
     testInfo_array: TestInfo[];
     constructor(settings: GeneratorSettings) {
         let { observation_json, observation_map, variable_definitions_json_arr, template_files, output_name } = settings;
-        variable_definitions_json_arr = variable_definitions_json_arr.map(v=>Object.assign({},v));
+        variable_definitions_json_arr = variable_definitions_json_arr.map(v=>cloneObj<JSONArr>(v, true));
         this.template_files = template_files;
         this.output_name = output_name;
         this.testInfo_array = [];
@@ -276,7 +299,7 @@ function mergeJSON(target, add) {
             if (target[key] && isObject(target[key]) && isObject(add[key])) {
                 mergeJSON(target[key], add[key]);
             } else {
-                target[key] = {...add[key]};
+                target[key] = add[key];
             }
         }
     }
