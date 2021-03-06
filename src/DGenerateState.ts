@@ -276,7 +276,7 @@ function mergeJSON(target, add) {
             if (target[key] && isObject(target[key]) && isObject(add[key])) {
                 mergeJSON(target[key], add[key]);
             } else {
-                target[key] = add[key];
+                target[key] = {...add[key]};
             }
         }
     }
