@@ -31,7 +31,7 @@ export function GenerateState(gs: GeneratorSettings): DGenerateState {
 
 const templateRegex = new RegExp(/{(.*?)}/);
 
-function cloneObj<T>(obj, deep=false): T{
+function cloneObj(obj, deep=false): any{
     var result = {};
     for(var key in obj){
       if(deep && obj[key] instanceof Object){
