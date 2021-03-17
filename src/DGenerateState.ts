@@ -79,6 +79,7 @@ export class DGenerateState {
                 testInfo.qualified_name = vdefObj.testInfo.qualified_name;
                 this.testInfo_array.push(testInfo);
             }
+            console.log(this.testInfo_array);
             mergeJSON(combinedJson, vdefObj);
         }
         /* need to:
@@ -210,11 +211,15 @@ export class DGenerateState {
                 qualified_name: e.qualified_name
             }
         });
+        console.log('===testInfoArr===')
+        console.log(testInfoArr);
+        testInfoArr = testInfoArr.filter(e=>e.summary!=undefined);
         let obj: VariableStore = Array.from(this.combinedMap).reduce((obj: any, [key, value]) => {
             obj[key] = value;
             return obj;
         }, {});
-        obj.testInfoArr = testInfoArr;
+        obj.testInfo = testInfoArr;
+        console.log('templatefiles',this.template_files);
         var merged = new DocxMerger({pageBreak: false}, this.template_files);
         let hasOutputName = this.output_name || false;
         let buf = null;

@@ -91,6 +91,7 @@ var DGenerateState = /** @class */ (function () {
                 testInfo.qualified_name = vdefObj.testInfo.qualified_name;
                 this.testInfo_array.push(testInfo);
             }
+            console.log(this.testInfo_array);
             mergeJSON(combinedJson, vdefObj);
         }
         /* need to:
@@ -260,12 +261,16 @@ var DGenerateState = /** @class */ (function () {
                 qualified_name: e.qualified_name
             };
         });
+        console.log('===testInfoArr===');
+        console.log(testInfoArr);
+        testInfoArr = testInfoArr.filter(function (e) { return e.summary != undefined; });
         var obj = Array.from(this.combinedMap).reduce(function (obj, _a) {
             var _b = __read(_a, 2), key = _b[0], value = _b[1];
             obj[key] = value;
             return obj;
         }, {});
-        obj.testInfoArr = testInfoArr;
+        obj.testInfo = testInfoArr;
+        console.log('templatefiles', this.template_files);
         var merged = new DocxMerger({ pageBreak: false }, this.template_files);
         var hasOutputName = this.output_name || false;
         var buf = null;

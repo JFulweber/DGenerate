@@ -1,5 +1,5 @@
 import { TestInfo } from "./TestInfo";
 
 export class VariableStore {
-    testInfoArr: TestInfo[];
+    testInfo: TestInfo[];
 }
