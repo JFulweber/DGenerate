@@ -39,6 +39,7 @@ var Observation_1 = require("./Observation");
 var TestInfo_1 = require("./TestInfo");
 var fs_1 = __importDefault(require("fs"));
 var JSONArr_1 = require("./JSONArr");
+var BoolConditionalVariable_1 = require("./BoolConditionalVariable");
 var Docxtemplater = require('docxtemplater');
 var DocxMerger = require('docx-merger');
 // const fs = require('fs');
@@ -317,6 +318,9 @@ function CreateVariableInstance(jsonInput) {
             break;
         case "STRING_CONST":
             out = new StringConstVariable_1.StringConstVariable(jsonInput);
+            break;
+        case "BOOL_COND":
+            out = new BoolConditionalVariable_1.BoolConditionalVariable(jsonInput);
             break;
     }
     return out;

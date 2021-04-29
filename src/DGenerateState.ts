@@ -19,6 +19,7 @@ import {saveAs} from 'file-saver';
 import fs from 'fs';
 import { JSONArr } from './JSONArr';
 import { VariableStore } from './VariableStore';
+import { BoolConditionalVariable } from './BoolConditionalVariable';
 
 const Docxtemplater = require('docxtemplater');
 const DocxMerger = require('docx-merger');
@@ -264,6 +265,9 @@ function CreateVariableInstance(jsonInput: UnparsedVariableJson): IVariable {
             break;
         case "STRING_CONST":
             out = new StringConstVariable(jsonInput);
+            break;
+        case "BOOL_COND":
+            out = new BoolConditionalVariable(jsonInput);
             break;
     }
     return out;
